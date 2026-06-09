@@ -2,6 +2,12 @@
 name = "claude-commit"
 version = "0.1.0"
 edition = "2021"
+description = "AI-powered git commit message generator using Claude Code CLI"
+license = "MIT"
+repository = "https://github.com/axelroman-dev/claude-commit"
+readme = "README.md"
+keywords = ["git", "commit", "ai", "claude", "cli"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 serde = { version = "1", features = ["derive"] }
