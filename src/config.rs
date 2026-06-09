@@ -4,9 +4,10 @@ use std::path::PathBuf;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Config {
-    pub language: String,       // "spanish" o "english"
-    pub commit_style: String,   // "conventional" o "simple"
-    pub suggestions_count: u8,  // cuántas sugerencias generar
+    pub language: String,
+    pub commit_style: String,
+    pub suggestions_count: u8,
+    pub max_title_length: u8,
 }
 
 impl Default for Config {
@@ -15,6 +16,7 @@ impl Default for Config {
             language: "english".to_string(),
             commit_style: "conventional".to_string(),
             suggestions_count: 3,
+            max_title_length: 80,
         }
     }
 }
@@ -22,7 +24,7 @@ impl Default for Config {
 impl Config {
     fn config_path() -> PathBuf {
         let mut path = dirs::config_dir().expect("No se pudo encontrar directorio de config");
-        path.push("commit-ai");
+        path.push("claude-commit");
         path.push("config.toml");
         path
     }

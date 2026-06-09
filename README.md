@@ -1,4 +1,4 @@
-# commit-ai
+# claude-commit
 
 AI-powered commit message generator built on top of [Claude Code CLI](https://claude.ai/code).
 
@@ -32,13 +32,13 @@ cargo install --path .
 Stage your changes, then run:
 
 ```sh
-commit-ai
+claude-commit
 ```
 
 Or use the explicit subcommand:
 
 ```sh
-commit-ai suggest
+claude-commit suggest
 ```
 
 Use arrow keys to select a suggestion and press Enter to commit.
@@ -48,13 +48,13 @@ Use arrow keys to select a suggestion and press Enter to commit.
 Run the interactive setup wizard:
 
 ```sh
-commit-ai config
+claude-commit config
 ```
 
 Or set options directly via flags:
 
 ```sh
-commit-ai config --language spanish --style conventional --count 3
+claude-commit config --language spanish --style conventional --count 3
 ```
 
 | Option | Values | Default |
@@ -66,10 +66,10 @@ commit-ai config --language spanish --style conventional --count 3
 View current configuration:
 
 ```sh
-commit-ai show
+claude-commit show
 ```
 
-Configuration is stored at `~/.config/commit-ai/config.toml`.
+Configuration is stored at `~/.config/claude-commit/config.toml`.
 
 ## Commit styles
 
