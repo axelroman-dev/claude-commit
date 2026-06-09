@@ -111,6 +111,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c8d4a3bb8b1e0c1050499d1815f5ab16d04f0959b233085fb31653fbfc9d98f9"
 
 [[package]]
+name = "claude-commit"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "colored",
+ "dialoguer",
+ "dirs",
+ "serde",
+ "toml",
+]
+
+[[package]]
 name = "colorchoice"
 version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -124,18 +136,6 @@ checksum = "117725a109d387c937a1533ce01b450cbde6b88abceea8473c4d7a85853cda3c"
 dependencies = [
  "lazy_static",
  "windows-sys 0.59.0",
-]
-
-[[package]]
-name = "commit-ai"
-version = "0.1.0"
-dependencies = [
- "clap",
- "colored",
- "dialoguer",
- "dirs",
- "serde",
- "toml",
 ]
 
 [[package]]

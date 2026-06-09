@@ -1,5 +1,5 @@
 [package]
-name = "commit-ai"
+name = "claude-commit"
 version = "0.1.0"
 edition = "2021"
 
