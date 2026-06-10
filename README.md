@@ -42,7 +42,14 @@ Or use the explicit subcommand:
 claude-commit suggest
 ```
 
-If you have unstaged changes, you'll get a checklist to pick which files to stage (`Space` to toggle, `Enter` to continue with whatever is checked — or nothing, to keep what's already staged).
+If you have unstaged changes, you'll get a checklist to pick which files to stage (`Space` to toggle, `Enter` to continue with whatever is checked — or nothing, to keep what's already staged):
+
+```
+Selecciona archivos a agregar (Space para marcar, Enter para continuar)
+[x] src/main.rs
+[ ] src/ui.rs
+[ ] README.md
+```
 
 Then Claude analyzes the staged diff and shows token usage and cost:
 

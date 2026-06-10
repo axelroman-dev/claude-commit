@@ -9,8 +9,8 @@ fn theme() -> ColorfulTheme {
         active_item_prefix: style("●".to_string()).for_stderr().cyan().bold(),
         inactive_item_prefix: style("○".to_string()).for_stderr().dim(),
         active_item_style: Style::new().for_stderr().cyan().bold(),
-        checked_item_prefix: style("●".to_string()).for_stderr().green(),
-        unchecked_item_prefix: style("○".to_string()).for_stderr().dim(),
+        checked_item_prefix: style("[x]".to_string()).for_stderr().green(),
+        unchecked_item_prefix: style("[ ]".to_string()).for_stderr().dim(),
         ..ColorfulTheme::default()
     }
 }
