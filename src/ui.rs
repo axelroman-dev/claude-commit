@@ -1,6 +1,19 @@
 use crate::config::Config;
 use colored::Colorize;
+use dialoguer::console::{style, Style};
+use dialoguer::theme::ColorfulTheme;
 use dialoguer::{Input, MultiSelect, Select};
+
+fn theme() -> ColorfulTheme {
+    ColorfulTheme {
+        active_item_prefix: style("●".to_string()).for_stderr().cyan().bold(),
+        inactive_item_prefix: style("○".to_string()).for_stderr().dim(),
+        active_item_style: Style::new().for_stderr().cyan().bold(),
+        checked_item_prefix: style("●".to_string()).for_stderr().green(),
+        unchecked_item_prefix: style("○".to_string()).for_stderr().dim(),
+        ..ColorfulTheme::default()
+    }
+}
 
 pub fn print_banner() {
     println!("{}", "╔═══════════════════════════╗".cyan());
@@ -52,23 +65,20 @@ pub fn select_suggestion(suggestions: &[String]) -> Option<String> {
     println!("{}", "💡 Sugerencias de commit:".yellow().bold());
     println!();
 
-    let mut opciones: Vec<String> = suggestions.iter().map(|s| format!("{}", s)).collect();
-    opciones.push("── Cancelar ──".to_string());
-
-    let selection = Select::new()
+    let selection = Select::with_theme(&theme())
         .with_prompt("Selecciona un mensaje (↑↓ para navegar, Enter para elegir)")
-        .items(&opciones)
+        .items(suggestions)
         .default(0)
         .interact();
 
     match selection {
-        Ok(index) if index < suggestions.len() => Some(suggestions[index].clone()),
-        _ => None,
+        Ok(index) => Some(suggestions[index].clone()),
+        Err(_) => None,
     }
 }
 
 pub fn select_files_to_stage(files: &[String]) -> Option<Vec<String>> {
-    let selected = MultiSelect::new()
+    let selected = MultiSelect::with_theme(&theme())
         .with_prompt("Selecciona archivos a agregar (Space para marcar, Enter para continuar)")
         .items(files)
         .interact();
