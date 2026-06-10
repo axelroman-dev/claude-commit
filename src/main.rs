@@ -4,7 +4,6 @@ mod git;
 mod ui;
 
 use clap::{Parser, Subcommand};
-use colored::Colorize;
 use config::Config;
 use std::process::Command;
 
@@ -129,6 +128,9 @@ fn run_suggest() {
         }
 
         println!();
+        ui::print_warning("No hay cambios en stage.");
+        println!();
+
         let files_to_stage = match ui::select_files_to_stage(&unstaged) {
             Some(f) => f,
             None => {
@@ -136,6 +138,11 @@ fn run_suggest() {
                 return;
             }
         };
+
+        if files_to_stage.is_empty() {
+            ui::print_error("No seleccionaste ningún archivo.");
+            return;
+        }
 
         if let Err(e) = git::stage_files(&files_to_stage) {
             ui::print_error(&e);
@@ -153,35 +160,34 @@ fn run_suggest() {
     } else {
         let unstaged = git::get_unstaged_files();
 
-        if !unstaged.is_empty() {
+        if unstaged.is_empty() {
+            diff
+        } else {
             println!();
-            ui::print_warning(&format!(
-                "{} archivo(s) con cambios sin stagear:",
-                unstaged.len()
-            ));
-            for f in &unstaged {
-                println!("  {} {}", "→".dimmed(), f);
-            }
+            ui::print_warning(&format!("{} archivo(s) con cambios sin stagear:", unstaged.len()));
             println!();
 
-            if let Some(files_to_stage) = ui::select_files_to_stage(&unstaged) {
-                if let Err(e) = git::stage_files(&files_to_stage) {
-                    ui::print_error(&e);
-                    return;
-                }
-                println!();
-                match git::get_staged_diff() {
-                    Ok(d) => d,
-                    Err(e) => {
+            match ui::select_files_to_stage(&unstaged) {
+                Some(files_to_stage) if !files_to_stage.is_empty() => {
+                    if let Err(e) = git::stage_files(&files_to_stage) {
                         ui::print_error(&e);
                         return;
                     }
+                    println!();
+                    match git::get_staged_diff() {
+                        Ok(d) => d,
+                        Err(e) => {
+                            ui::print_error(&e);
+                            return;
+                        }
+                    }
                 }
-            } else {
-                diff
+                Some(_) => diff,
+                None => {
+                    println!("Cancelado.");
+                    return;
+                }
             }
-        } else {
-            diff
         }
     };
 

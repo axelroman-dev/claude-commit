@@ -68,32 +68,14 @@ pub fn select_suggestion(suggestions: &[String]) -> Option<String> {
 }
 
 pub fn select_files_to_stage(files: &[String]) -> Option<Vec<String>> {
-    println!("{}", "📂 Hay cambios sin stagear:".yellow().bold());
-    println!();
-
-    let opciones = ["Agregar todos", "Seleccionar archivos", "── Cancelar ──"];
-    let choice = Select::new()
-        .with_prompt("¿Qué archivos quieres agregar?")
-        .items(&opciones)
-        .default(0)
+    let selected = MultiSelect::new()
+        .with_prompt("Selecciona archivos a agregar (Space para marcar, Enter para continuar)")
+        .items(files)
         .interact();
 
-    match choice {
-        Ok(0) => Some(files.to_vec()),
-        Ok(1) => {
-            let selected = MultiSelect::new()
-                .with_prompt("Selecciona archivos (Space para marcar, Enter para confirmar)")
-                .items(files)
-                .interact();
-
-            match selected {
-                Ok(indices) if !indices.is_empty() => {
-                    Some(indices.iter().map(|&i| files[i].clone()).collect())
-                }
-                _ => None,
-            }
-        }
-        _ => None,
+    match selected {
+        Ok(indices) => Some(indices.iter().map(|&i| files[i].clone()).collect()),
+        Err(_) => None,
     }
 }
 
