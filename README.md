@@ -6,10 +6,11 @@ Analyzes your `git diff` and suggests meaningful commit messages — with suppor
 
 ## How it works
 
-1. Reads your staged (or unstaged) `git diff`
-2. Sends it to Claude Code CLI via `claude --print`
-3. Parses the response into a list of suggestions
-4. Lets you pick one interactively and commits it
+1. Checks your `git status` — if there are unstaged changes, lets you pick which files to stage (or skip and use only what's already staged)
+2. Reads the staged `git diff`
+3. Sends it to Claude Code CLI via `claude --print --output-format json`
+4. Parses the response into a list of suggestions
+5. Lets you pick one interactively and commits it
 
 ## Prerequisites
 
@@ -22,14 +23,14 @@ Analyzes your `git diff` and suggests meaningful commit messages — with suppor
 ## Installation
 
 ```sh
-git clone https://github.com/your-username/claude-commit
+git clone https://github.com/axelroman-dev/claude-commit
 cd claude-commit
 cargo install --path .
 ```
 
 ## Usage
 
-Stage your changes, then run:
+Just run it from inside your repo:
 
 ```sh
 claude-commit
@@ -41,7 +42,15 @@ Or use the explicit subcommand:
 claude-commit suggest
 ```
 
-Use arrow keys to select a suggestion and press Enter to commit.
+If you have unstaged changes, you'll get a checklist to pick which files to stage (`Space` to toggle, `Enter` to continue with whatever is checked — or nothing, to keep what's already staged).
+
+Then Claude analyzes the staged diff and shows token usage and cost:
+
+```
+tokens  in: 11727 | out: 48 | $0.0260
+```
+
+Use arrow keys to select a suggestion and press `Enter` to commit, or `Ctrl+C` to cancel at any point.
 
 ### Configuration
 
@@ -54,7 +63,7 @@ claude-commit config
 Or set options directly via flags:
 
 ```sh
-claude-commit config --language spanish --style conventional --count 3
+claude-commit config --language spanish --style conventional --count 3 --max-length 72
 ```
 
 | Option | Values | Default |
@@ -62,6 +71,7 @@ claude-commit config --language spanish --style conventional --count 3
 | `--language` | `english`, `spanish` | `english` |
 | `--style` | `conventional`, `simple` | `conventional` |
 | `--count` | `1`–`5` | `3` |
+| `--max-length` | min `20` | `80` |
 
 View current configuration:
 
@@ -92,6 +102,7 @@ Fix null response handling in user endpoint
 - [clap](https://github.com/clap-rs/clap) — CLI argument parsing
 - [dialoguer](https://github.com/console-rs/dialoguer) — interactive terminal UI
 - [colored](https://github.com/mackwic/colored) — terminal colors
+- [serde_json](https://github.com/serde-rs/json) — parsing Claude CLI output
 
 ## License
 
