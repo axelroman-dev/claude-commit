@@ -35,6 +35,7 @@ pub fn get_suggestions(diff: &str, config: &Config) -> Result<(Vec<String>, Usag
 
     let output = Command::new("claude")
         .args(["--print", "--output-format", "json"])
+        .arg("--disallowedTools=Bash,Read,Glob,Grep,Write,Edit,WebFetch,WebSearch,Task")
         .arg(&prompt)
         .output()
         .map_err(|e| format!("Error ejecutando claude CLI: {}", e))?;
