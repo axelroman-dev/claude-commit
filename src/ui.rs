@@ -75,6 +75,7 @@ pub fn select_suggestion(suggestions: &[String]) -> Option<String> {
 
     let selection = Select::with_theme(&theme())
         .with_prompt("Selecciona un mensaje (↑↓ para navegar, Enter para elegir)")
+        .report(false)
         .items(suggestions)
         .default(0)
         .interact();
