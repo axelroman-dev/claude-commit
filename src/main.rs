@@ -196,40 +196,46 @@ fn run_suggest() {
 
     let diff_content = git::truncate_diff(&diff.content, 8000);
 
-    ui::print_loading();
-    let (suggestions, usage) = match claude::get_suggestions(&diff_content, &config) {
-        Ok(s) => s,
-        Err(e) => {
-            ui::print_error(&e);
-            return;
-        }
-    };
-
-    ui::print_usage(usage.input_tokens, usage.output_tokens, usage.cost_usd);
-    println!();
-
-    let selected = ui::select_suggestion(&suggestions);
-
-    match selected {
-        Some(msg) => {
-            println!();
-            let output = Command::new("git").args(["commit", "-m", &msg]).output();
-
-            match output {
-                Ok(o) if o.status.success() => {
-                    ui::print_success(&format!("Commit creado: {}", msg));
-                }
-                Ok(o) => {
-                    let stderr = String::from_utf8_lossy(&o.stderr);
-                    ui::print_error(&format!("Git error: {}", stderr));
-                }
-                Err(e) => {
-                    ui::print_error(&format!("Error ejecutando git: {}", e));
-                }
+    loop {
+        ui::print_loading();
+        let (suggestions, usage) = match claude::get_suggestions(&diff_content, &config) {
+            Ok(s) => s,
+            Err(e) => {
+                ui::print_error(&e);
+                return;
             }
-        }
-        None => {
-            println!("Cancelado.");
+        };
+
+        ui::print_usage(usage.input_tokens, usage.output_tokens, usage.cost_usd);
+        println!();
+
+        match ui::select_suggestion(&suggestions) {
+            ui::SuggestionResult::Commit(msg) => {
+                println!();
+                let output = Command::new("git").args(["commit", "-m", &msg]).output();
+
+                match output {
+                    Ok(o) if o.status.success() => {
+                        ui::print_success(&format!("Commit creado: {}", msg));
+                    }
+                    Ok(o) => {
+                        let stderr = String::from_utf8_lossy(&o.stderr);
+                        ui::print_error(&format!("Git error: {}", stderr));
+                    }
+                    Err(e) => {
+                        ui::print_error(&format!("Error ejecutando git: {}", e));
+                    }
+                }
+                break;
+            }
+            ui::SuggestionResult::Regenerate => {
+                println!();
+                continue;
+            }
+            ui::SuggestionResult::Cancel => {
+                println!("Cancelado.");
+                break;
+            }
         }
     }
 }
