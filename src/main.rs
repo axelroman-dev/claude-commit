@@ -164,6 +164,7 @@ fn run_suggest() {
             diff
         } else {
             println!();
+            ui::print_staged_files(&diff.files_changed);
             ui::print_warning(&format!("{} archivo(s) con cambios sin stagear:", unstaged.len()));
             println!();
 

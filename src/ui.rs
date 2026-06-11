@@ -30,6 +30,14 @@ pub fn print_files(files: &[String]) {
     println!();
 }
 
+pub fn print_staged_files(files: &[String]) {
+    println!("{}", "📦 Ya en stage:".green().bold());
+    for file in files {
+        println!("  {} {}", "✔".green(), file.white());
+    }
+    println!();
+}
+
 pub fn print_loading() {
     println!("{}", "🤖 Analizando diff con Claude Code...".cyan());
 }
