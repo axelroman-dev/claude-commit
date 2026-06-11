@@ -76,56 +76,80 @@ pub fn select_suggestion(suggestions: &[String]) -> SuggestionResult {
         return SuggestionResult::Cancel;
     }
 
-    println!("{}", "💡 Sugerencias de commit:".yellow().bold());
-    println!();
-
     let mut opciones: Vec<String> = suggestions.to_vec();
-    let edit_idx = opciones.len();
-    opciones.push("✎ Editar una sugerencia".to_string());
     let regen_idx = opciones.len();
     opciones.push("↻ Regenerar sugerencias".to_string());
 
+    loop {
+        println!("{}", "💡 Sugerencias de commit:".yellow().bold());
+        println!();
+
+        let selection = Select::with_theme(&theme())
+            .with_prompt("Selecciona un mensaje (↑↓ para navegar, Enter para elegir)")
+            .report(false)
+            .items(&opciones)
+            .default(0)
+            .interact();
+
+        match selection {
+            Ok(index) if index < suggestions.len() => {
+                println!();
+                match confirm_or_edit(&suggestions[index]) {
+                    ConfirmResult::Confirm(msg) => return SuggestionResult::Commit(msg),
+                    ConfirmResult::Back => {
+                        println!();
+                        continue;
+                    }
+                    ConfirmResult::Cancel => return SuggestionResult::Cancel,
+                }
+            }
+            Ok(index) if index == regen_idx => return SuggestionResult::Regenerate,
+            _ => return SuggestionResult::Cancel,
+        }
+    }
+}
+
+enum ConfirmResult {
+    Confirm(String),
+    Back,
+    Cancel,
+}
+
+fn confirm_or_edit(message: &str) -> ConfirmResult {
+    println!("{} {}", "→".dimmed(), message.bold());
+    println!();
+
+    let opciones = ["Confirmar", "Editar", "← Volver"];
+
     let selection = Select::with_theme(&theme())
-        .with_prompt("Selecciona un mensaje (↑↓ para navegar, Enter para elegir)")
+        .with_prompt("¿Qué quieres hacer?")
         .report(false)
         .items(&opciones)
         .default(0)
         .interact();
 
     match selection {
-        Ok(index) if index < suggestions.len() => {
-            SuggestionResult::Commit(suggestions[index].clone())
+        Ok(0) => ConfirmResult::Confirm(message.to_string()),
+        Ok(1) => {
+            let edited: Result<String, _> = Input::with_theme(&theme())
+                .with_prompt("Edita el mensaje")
+                .with_initial_text(message.to_string())
+                .interact_text();
+
+            match edited {
+                Ok(text) => {
+                    let trimmed = text.trim().to_string();
+                    if trimmed.is_empty() {
+                        ConfirmResult::Back
+                    } else {
+                        ConfirmResult::Confirm(trimmed)
+                    }
+                }
+                Err(_) => ConfirmResult::Cancel,
+            }
         }
-        Ok(index) if index == edit_idx => match edit_suggestion(suggestions) {
-            Some(msg) => SuggestionResult::Commit(msg),
-            None => SuggestionResult::Cancel,
-        },
-        Ok(index) if index == regen_idx => SuggestionResult::Regenerate,
-        _ => SuggestionResult::Cancel,
-    }
-}
-
-fn edit_suggestion(suggestions: &[String]) -> Option<String> {
-    let index = Select::with_theme(&theme())
-        .with_prompt("¿Cuál mensaje quieres editar?")
-        .report(false)
-        .items(suggestions)
-        .default(0)
-        .interact()
-        .ok()?;
-
-    let edited: String = Input::with_theme(&theme())
-        .with_prompt("Edita el mensaje")
-        .with_initial_text(suggestions[index].clone())
-        .interact_text()
-        .ok()?;
-
-    let trimmed = edited.trim().to_string();
-
-    if trimmed.is_empty() {
-        None
-    } else {
-        Some(trimmed)
+        Ok(_) => ConfirmResult::Back,
+        Err(_) => ConfirmResult::Cancel,
     }
 }
 
